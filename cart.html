@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ru">
+<head>
+   <meta charset="UTF-8">
+   <title>Document</title>
+   <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+</head>
+<body>
+   <div id="wrapper">
+      <div id="items">
+         <div class="item-1">
+            <p class="title">Первое</p>
+            <p class="price">200</p>
+            <p class="minus">-</p>
+            <p class="count">1</p>
+            <p class="plus">+</p>
+            <p class="add">Добавить</p>
+         </div>
+         <div class="item-2">
+            <p class="title">Второе</p>
+            <p class="price">100</p>
+            <p class="minus">-</p>
+            <p class="count">1</p>
+            <p class="plus">+</p>
+            <p class="add">Добавить</p>
+         </div>
+      </div>
+      <div id="cart">
+         <form action="#">
+            <input type="text" name="blud" id="blud" placeholder="кол. блюд">
+            <input type="text" name="summ" id="summ" placeholder="цена">
+         </form>
+         <div id="info"></div>
+      </div>      
+   </div>
+
+   <script>
+
+   function changeDelegate(diff) {
+      return function(event) {
+        var $count = $(this)
+               .parent('div')
+               .children('.count'),
+         mc = parseInt($count.text(), 10) + diff;
+         if (mc < 1) mc = 1;
+         $count.text(mc);
+      };
+   }
+   $('.plus').click(changeDelegate(1));
+   $('.minus').click(changeDelegate(-1));
+
+
+      $(".add").click(function() {
+         var th = $(this);
+         var parCl = $("div[class^=item-]");
+         // Получаем ид из класса
+         var classNum = parseInt(th.parent(parCl).attr('class').replace(/\D+/g,""));
+         // Помещяем все данные в соответствующие переменные
+         var title = th.parent(parCl).children('.title').text();
+         var price = parseInt(th.parent(parCl).children('.price').text());
+         var count = parseInt(th.parent(parCl).children('.count').text());
+         // Считаем первоначальную сумму
+         var elemSumm = price*count;
+         // Получаем сумму из инпута для последующего увеличения
+         var mainSumm = parseInt(($("#summ").val()+0)/10);
+         // Проверяем помещена ли позиция в корзину
+         if($("div").is(".cart-item-"+classNum)){
+            // Если да получаем колиество из уже существующего класса
+            var newCount = parseInt($(".cart-item-"+classNum+" .cart-count").text());
+            var countOut = count + newCount;
+            $(".cart-item-"+classNum+" .cart-count").text(countOut)
+            // Увеличиваем сумму
+            var mainSummOut = mainSumm + elemSumm;
+            $("#summ").val(parseInt(mainSummOut));
+         }
+         else{
+            // Если нет добавляем
+            $("#info").append("<div class='cart-item-"+classNum+" style=\"display:none;\"'><span class=\"cart-title\">"+title+"</span><span class=\"cart-price\">"+price+"</span><span class=\"cart-count\">"+count+"</span><div class=\"delite-"+classNum+"\">x</div></div>").hide().fadeIn();
+            // Увеличиваем значение суммы
+            var mainSummOut = mainSumm + elemSumm;
+            $("#summ").val(parseInt(mainSummOut));
+         }
+         // Считаем и выводим количество уникальных позиций
+         var blud = $("div[class^=cart-item-]").length;
+         $("#blud").val(blud);
+      });
+
+      $(document).on("click", "div[class^=delite]", function(event){
+         var th = $(this);
+         var delCl = $("div[class^=delite-]");
+         var delNum = parseInt(th.parent(delCl).attr('class').replace(/\D+/g,""));
+
+         var cadp = parseInt($(".cart-item-"+delNum).children('.cart-price').text());
+         var cadc = parseInt($(".cart-item-"+delNum).children('.cart-count').text());
+         var smv = $("#summ").val();
+         var caps = cadp*cadc;
+         var fns = smv-caps;
+         $(".cart-item-"+delNum).slideUp(function() {
+            $(this).remove();
+         });
+         $("#summ").val(fns);
+         var olb = parseInt($("#blud").val());
+         var nb = olb-1;
+         $("#blud").val(nb);
+      });
+
+   </script>
+
+   <style>
+      #wrapper{
+         width: 405px;
+         float: left;
+      }
+      #items{
+         overflow: hidden;
+         text-align: center;
+      }
+      div[class^=item-]{
+         float: left;
+         width: 200px;
+         margin-right: -1px;
+         border: 1px solid #333;
+      }
+      .add{
+         color: #fff;
+         background: #000;
+         padding: 10px 0px;
+         cursor: pointer;
+      }
+      div[class^=cart-item]{
+         line-height: 1;
+         margin: 20px;
+         text-align: center;
+      }
+      div[class^=cart-item] span{
+         display: block;
+      }
+      form{
+         width: 270px;
+         margin: auto;
+         overflow: hidden;
+      }
+      input {
+         width: 100px;
+         border: 1px solid #333;
+         padding: 0 6px;
+         margin: 10px;
+         float: left;
+      }
+      .plus, .count, .minus{
+         display: inline-block;
+         width: 20%;
+      }
+      .plus, .minus{
+         background: #444;
+         color: #FFF;
+         border: 2px solid #000;
+         cursor: pointer;
+      }
+   </style>
+<body>
+</html>
